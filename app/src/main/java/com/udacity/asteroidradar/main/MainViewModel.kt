@@ -1,22 +1,24 @@
 package com.udacity.asteroidradar.main
 
-import android.util.Log
+import android.annotation.SuppressLint
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.udacity.asteroidradar.AsteroidModel
+import com.udacity.asteroidradar.Asteroid
 import com.udacity.asteroidradar.ImageOfTheDayModel
 import com.udacity.asteroidradar.api.RetrofitObject
+import com.udacity.asteroidradar.api.parseAsteroidsJsonResult
 import kotlinx.coroutines.launch
+import org.json.JSONObject
 import java.text.SimpleDateFormat
 import java.util.*
 
 class MainViewModel : ViewModel() {
 
-    private val _response = MutableLiveData<AsteroidModel>()
-    val response: LiveData<AsteroidModel>
-        get() = _response
+    private val _asteroidList = MutableLiveData<ArrayList<Asteroid>>()
+    val asteroidList: LiveData<ArrayList<Asteroid>>
+        get() = _asteroidList
 
     private val _imageOfTheDay = MutableLiveData<ImageOfTheDayModel>()
     val imageOfTheDay: LiveData<ImageOfTheDayModel>
@@ -25,11 +27,19 @@ class MainViewModel : ViewModel() {
     fun getNeoFeed() {
         viewModelScope.launch {
             try {
-                _response.postValue(RetrofitObject.retrofit.getNeoFeed("2015-09-07", "2015-09-08").body())
+//                _response.postValue(RetrofitObject.retrofit.getNeoFeed(todayDate(), tomorrowDate()).body())
+                val responseBody = RetrofitObject.retrofit.getNeoFeed(todayDate(), tomorrowDate()).string()
+
+                val jsonObject = JSONObject(responseBody)
+                val asteroidList = parseAsteroidsJsonResult(jsonObject)
+
+                _asteroidList.postValue(asteroidList)
+
             } catch (e: Exception) {
             }
         }
     }
+
     fun getImageOfTheDay() {
         viewModelScope.launch {
             try {
@@ -38,13 +48,22 @@ class MainViewModel : ViewModel() {
             }
         }
     }
-//    fun getDate():String{
-//        val date = Calendar.getInstance().time
-//       // val formatter = SimpleDateFormat.getDateTimeInstance()
-//        val sdf = SimpleDateFormat("yyyy-MM-dd")
-//        val formatedDate = sdf.format(date)
-//        Log.e("formatedDate",formatedDate)
-//        return formatedDate
-//    }
+
+    @SuppressLint("SimpleDateFormat")
+    private fun todayDate(): String {
+        val calendar = Calendar.getInstance()
+        val todayDate = calendar.time
+        val sdf = SimpleDateFormat("yyyy-MM-dd")
+        return sdf.format(todayDate)
+    }
+
+    @SuppressLint("SimpleDateFormat")
+    private fun tomorrowDate(): String {
+        val calendar = Calendar.getInstance()
+        calendar.add(Calendar.DAY_OF_YEAR, 7)
+        val tomorrowDate = calendar.time
+        val sdf = SimpleDateFormat("yyyy-MM-dd")
+        return sdf.format(tomorrowDate)
+    }
 
 }
