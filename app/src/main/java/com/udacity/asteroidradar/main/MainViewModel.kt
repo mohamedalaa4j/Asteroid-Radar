@@ -7,6 +7,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.udacity.asteroidradar.Asteroid
 import com.udacity.asteroidradar.ImageOfTheDayModel
+import com.udacity.asteroidradar.StateManagement
 import com.udacity.asteroidradar.api.RetrofitObject
 import com.udacity.asteroidradar.api.parseAsteroidsJsonResult
 import kotlinx.coroutines.launch
@@ -24,18 +25,27 @@ class MainViewModel : ViewModel() {
     val imageOfTheDay: LiveData<ImageOfTheDayModel>
         get() = _imageOfTheDay
 
+    private val _stateManagement = MutableLiveData<StateManagement>()
+
+    val stateManagement: LiveData<StateManagement>
+        get() = _stateManagement
+
+    val text = "test"
+
     fun getNeoFeed() {
         viewModelScope.launch {
             try {
-//                _response.postValue(RetrofitObject.retrofit.getNeoFeed(todayDate(), tomorrowDate()).body())
+                _stateManagement.postValue(StateManagement.LOADING)
                 val responseBody = RetrofitObject.retrofit.getNeoFeed(todayDate(), tomorrowDate()).string()
 
                 val jsonObject = JSONObject(responseBody)
                 val asteroidList = parseAsteroidsJsonResult(jsonObject)
 
                 _asteroidList.postValue(asteroidList)
+                _stateManagement.postValue(StateManagement.DONE)
 
             } catch (e: Exception) {
+                _stateManagement.postValue(StateManagement.ERROR)
             }
         }
     }

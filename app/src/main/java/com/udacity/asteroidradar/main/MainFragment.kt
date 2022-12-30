@@ -1,20 +1,21 @@
 package com.udacity.asteroidradar.main
 
 import android.os.Bundle
-import android.util.Log
 import android.view.*
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.observe
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.squareup.picasso.Picasso
-import com.udacity.asteroidradar.Asteroid
 import com.udacity.asteroidradar.R
 import com.udacity.asteroidradar.RvAsteroidsAdapter
+import com.udacity.asteroidradar.StateManagement
 import com.udacity.asteroidradar.databinding.FragmentMainBinding
 
 class MainFragment : Fragment() {
     private var binding: FragmentMainBinding? = null
+
     private val viewModel: MainViewModel by lazy {
         ViewModelProvider(this).get(MainViewModel::class.java)
     }
@@ -33,13 +34,34 @@ class MainFragment : Fragment() {
         viewModel.getNeoFeed()
         viewModel.getImageOfTheDay()
 
-        viewModel.asteroidList.observe(viewLifecycleOwner) {
-            Log.e("astreoid",it.toString())
-            setupRV(it)
+        viewModel.stateManagement.observe(viewLifecycleOwner) {
+            when (it) {
+                StateManagement.DONE ->{
+                    binding?.statusLoadingWheel?.visibility = View.GONE
+                    binding?.ivRefresh?.visibility = View.GONE
+                }
+                StateManagement.LOADING -> {
+                    binding?.statusLoadingWheel?.visibility = View.VISIBLE
+                    binding?.ivRefresh?.visibility = View.GONE
+                }
+                StateManagement.ERROR -> {
+                    binding?.statusLoadingWheel?.visibility = View.GONE
+                    binding?.ivRefresh?.visibility = View.VISIBLE
+                    Toast.makeText(context, getString(R.string.error), Toast.LENGTH_SHORT).show()
+                }
+            }
         }
+
+        setupRV()
+
         viewModel.imageOfTheDay.observe(viewLifecycleOwner) {
             Picasso.with(context).load(it.url).into(binding?.activityMainImageOfTheDay)
             binding?.activityMainImageOfTheDay?.contentDescription = it.title
+        }
+
+        binding?.ivRefresh?.setOnClickListener {
+            viewModel.getNeoFeed()
+            viewModel.getImageOfTheDay()
         }
 
         return binding!!.root
@@ -59,11 +81,11 @@ class MainFragment : Fragment() {
         return true
     }
 
-    private fun setupRV(data : ArrayList<Asteroid>){
+    private fun setupRV() {
         binding?.asteroidRecycler?.layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
 
         // adapter
-        val adapter = RvAsteroidsAdapter(data)
+        val adapter = RvAsteroidsAdapter()
         binding?.asteroidRecycler?.adapter = adapter
     }
 }
