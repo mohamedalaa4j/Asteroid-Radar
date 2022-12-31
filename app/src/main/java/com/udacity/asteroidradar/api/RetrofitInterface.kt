@@ -1,13 +1,10 @@
 package com.udacity.asteroidradar.api
 
-import com.squareup.moshi.Json
-import com.udacity.asteroidradar.AsteroidModel
 import com.udacity.asteroidradar.Constants.API_KEY
 import com.udacity.asteroidradar.Constants.IMAGE_OF_THE_DAY
 import com.udacity.asteroidradar.Constants.NEO_FEED
 import com.udacity.asteroidradar.ImageOfTheDayModel
 import okhttp3.ResponseBody
-import org.json.JSONObject
 import retrofit2.Response
 import retrofit2.http.GET
 import retrofit2.http.Query

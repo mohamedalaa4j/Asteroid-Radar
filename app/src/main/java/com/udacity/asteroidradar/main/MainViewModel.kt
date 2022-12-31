@@ -10,12 +10,14 @@ import com.udacity.asteroidradar.ImageOfTheDayModel
 import com.udacity.asteroidradar.StateManagement
 import com.udacity.asteroidradar.api.RetrofitObject
 import com.udacity.asteroidradar.api.parseAsteroidsJsonResult
+import com.udacity.asteroidradar.database.AsteroidDAO
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import org.json.JSONObject
 import java.text.SimpleDateFormat
 import java.util.*
 
-class MainViewModel : ViewModel() {
+class MainViewModel(private val database: AsteroidDAO) : ViewModel() {
 
     private val _asteroidList = MutableLiveData<ArrayList<Asteroid>>()
     val asteroidList: LiveData<ArrayList<Asteroid>>
@@ -30,8 +32,9 @@ class MainViewModel : ViewModel() {
     val stateManagement: LiveData<StateManagement>
         get() = _stateManagement
 
+
     fun getNeoFeed() {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO){
             try {
                 _stateManagement.postValue(StateManagement.LOADING)
                 val responseBody = RetrofitObject.retrofit.getNeoFeed(todayDate(), tomorrowDate()).string()
@@ -41,6 +44,9 @@ class MainViewModel : ViewModel() {
 
                 _asteroidList.postValue(asteroidList)
                 _stateManagement.postValue(StateManagement.DONE)
+
+//                for (asteroid in asteroidList )
+//                database.insert(asteroid)
 
             } catch (e: Exception) {
                 _stateManagement.postValue(StateManagement.ERROR)

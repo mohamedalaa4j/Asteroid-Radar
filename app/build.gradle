@@ -4,6 +4,8 @@ apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-kapt'
 apply plugin: 'androidx.navigation.safeargs'
 apply plugin: 'kotlin-android-extensions'
+apply plugin:  "org.jetbrains.kotlin.kapt"
+
 
 android {
     compileSdkVersion 30
@@ -63,9 +65,11 @@ dependencies {
 
     implementation 'com.squareup.picasso:picasso:2.5.2'
 
-    implementation("androidx.room:room-ktx:2.3.0-alpha01")
-    implementation "androidx.room:room-runtime:2.3.0-alpha01"
-    kapt "androidx.room:room-compiler:2.3.0-alpha01"
+    implementation("androidx.room:room-ktx:2.5.0-rc01")
+    implementation "androidx.room:room-runtime:2.5.0-rc01"
+    kapt "androidx.room:room-compiler:2.5.0-rc01"
+    annotationProcessor "androidx.room:room-compiler:2.5.0-rc01"
+
 
     implementation "android.arch.work:work-runtime-ktx:1.0.1"
 

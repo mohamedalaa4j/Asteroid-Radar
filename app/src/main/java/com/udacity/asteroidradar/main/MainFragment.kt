@@ -12,14 +12,15 @@ import com.squareup.picasso.Picasso
 import com.udacity.asteroidradar.R
 import com.udacity.asteroidradar.RvAsteroidsAdapter
 import com.udacity.asteroidradar.StateManagement
+import com.udacity.asteroidradar.database.AsteroidDatabase
 import com.udacity.asteroidradar.databinding.FragmentMainBinding
 
 class MainFragment : Fragment() {
     private var binding: FragmentMainBinding? = null
 
-    private val viewModel: MainViewModel by lazy {
-        ViewModelProvider(this).get(MainViewModel::class.java)
-    }
+//    private val viewModel: MainViewModel by lazy {
+//        ViewModelProvider(this).get(MainViewModel::class.java)
+//    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -27,6 +28,14 @@ class MainFragment : Fragment() {
     ): View {
         binding = FragmentMainBinding.inflate(inflater)
         binding?.lifecycleOwner = this
+
+        val application = requireNotNull(this.activity).application
+
+        val database = AsteroidDatabase.getInstance(application).asteroidDAO
+
+        val viewModelFactory = MainViewModelFactory(database)
+        val viewModel = ViewModelProvider(this, viewModelFactory).get(MainViewModel::class.java)
+
 
         binding?.viewModel = viewModel
 
