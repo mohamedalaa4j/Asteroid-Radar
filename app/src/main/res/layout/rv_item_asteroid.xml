@@ -7,7 +7,6 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:padding="16dp"
-        android:foreground="?attr/selectableItemBackground"
         >
 
         <TextView
@@ -15,7 +14,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             tools:text="2007 BB49"
-            android:textColor="#FFFFFF"
+            android:textColor="@color/default_text_color"
             android:textSize="18sp"
             android:textStyle="bold"
             app:layout_constraintStart_toStartOf="parent"
@@ -26,7 +25,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             tools:text="2222-22-22"
-            android:textColor="#FFFFFF"
+            android:textColor="@color/default_text_color"
             android:textSize="14sp"
             android:textStyle="bold"
             app:layout_constraintStart_toStartOf="@id/tvName"

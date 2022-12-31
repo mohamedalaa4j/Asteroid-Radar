@@ -8,7 +8,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.squareup.picasso.Picasso
 import com.udacity.asteroidradar.databinding.RvItemAsteroidBinding
 
-class RvAsteroidsAdapter : ListAdapter<Asteroid, RvAsteroidsAdapter.ViewHolder>(AsteroidsDiffCallback()) {
+class RvAsteroidsAdapter(private val onClickListener: OnClickListener) : ListAdapter<Asteroid, RvAsteroidsAdapter.ViewHolder>(AsteroidsDiffCallback()) {
 
     class ViewHolder(binding: RvItemAsteroidBinding) : RecyclerView.ViewHolder(binding.root) {
         val tvName = binding.tvName
@@ -37,6 +37,14 @@ class RvAsteroidsAdapter : ListAdapter<Asteroid, RvAsteroidsAdapter.ViewHolder>(
         } else {
             Picasso.with(context).load(R.drawable.ic_status_normal).into(holder.ivStatus)
         }
+
+        holder.itemView.setOnClickListener {
+            onClickListener.onClick(item)
+        }
+    }
+
+    class OnClickListener(val lambda: (asteroidObject:Asteroid) -> Unit) {
+        fun onClick(asteroidObject:Asteroid) = lambda(asteroidObject)
     }
 }
 

@@ -6,6 +6,7 @@ import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.observe
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.squareup.picasso.Picasso
 import com.udacity.asteroidradar.R
@@ -31,9 +32,6 @@ class MainFragment : Fragment() {
 
         setHasOptionsMenu(true)
 
-        viewModel.getNeoFeed()
-        viewModel.getImageOfTheDay()
-
         viewModel.stateManagement.observe(viewLifecycleOwner) {
             when (it) {
                 StateManagement.DONE ->{
@@ -52,12 +50,12 @@ class MainFragment : Fragment() {
             }
         }
 
-        setupRV()
-
         viewModel.imageOfTheDay.observe(viewLifecycleOwner) {
             Picasso.with(context).load(it.url).into(binding?.activityMainImageOfTheDay)
             binding?.activityMainImageOfTheDay?.contentDescription = it.title
         }
+
+        setupRV()
 
         binding?.ivRefresh?.setOnClickListener {
             viewModel.getNeoFeed()
@@ -85,7 +83,9 @@ class MainFragment : Fragment() {
         binding?.asteroidRecycler?.layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
 
         // adapter
-        val adapter = RvAsteroidsAdapter()
+        val adapter = RvAsteroidsAdapter(RvAsteroidsAdapter.OnClickListener{
+            findNavController().navigate(MainFragmentDirections.actionShowDetail(it))
+        })
         binding?.asteroidRecycler?.adapter = adapter
     }
 }

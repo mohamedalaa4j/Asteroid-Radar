@@ -30,8 +30,6 @@ class MainViewModel : ViewModel() {
     val stateManagement: LiveData<StateManagement>
         get() = _stateManagement
 
-    val text = "test"
-
     fun getNeoFeed() {
         viewModelScope.launch {
             try {
@@ -76,4 +74,8 @@ class MainViewModel : ViewModel() {
         return sdf.format(tomorrowDate)
     }
 
+    init {
+        getNeoFeed()
+        getImageOfTheDay()
+    }
 }
