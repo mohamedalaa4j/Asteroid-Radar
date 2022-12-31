@@ -1,27 +1,22 @@
 package com.udacity.asteroidradar.database
 
+import androidx.lifecycle.LiveData
 import androidx.room.Dao
 import androidx.room.Insert
+import androidx.room.OnConflictStrategy
+import androidx.room.Query
 import com.udacity.asteroidradar.Asteroid
 
 @Dao
 interface AsteroidDAO {
 
-    @Insert
-    suspend fun insert(asteroid: AsteroidEntity)
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insert(asteroid: Asteroid)
 
-//    @Update
-//    suspend fun update(night: SleepNight)
-//
-//    @Query("SELECT * from daily_sleep_quality_table WHERE nightId = :key")
-//    suspend fun get(key: Long): SleepNight?
-//
-//    @Query("DELETE FROM daily_sleep_quality_table")
-//    suspend fun clear()
-//
-//    @Query("SELECT * FROM daily_sleep_quality_table ORDER BY nightId DESC")
-//    fun getAllNights(): LiveData<List<SleepNight>>
-//
-//    @Query("SELECT * FROM daily_sleep_quality_table ORDER BY nightId DESC LIMIT 1")
-//    suspend fun getTonight(): SleepNight?
+    @Query("select * from asteroids_table ORDER BY closeApproachDate")
+     fun getAsteroids(): LiveData<List<Asteroid>>
+
+    @Query("DELETE FROM asteroids_table WHERE closeApproachDate < :todayDate")
+     fun clear(todayDate:String)
+
 }

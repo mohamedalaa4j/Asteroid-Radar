@@ -19,9 +19,9 @@ import java.util.*
 
 class MainViewModel(private val database: AsteroidDAO) : ViewModel() {
 
-    private val _asteroidList = MutableLiveData<ArrayList<Asteroid>>()
-    val asteroidList: LiveData<ArrayList<Asteroid>>
-        get() = _asteroidList
+//    private val _asteroidList = MutableLiveData<ArrayList<Asteroid>>()
+//    val asteroidList: LiveData<ArrayList<Asteroid>>
+//        get() = _asteroidList
 
     private val _imageOfTheDay = MutableLiveData<ImageOfTheDayModel>()
     val imageOfTheDay: LiveData<ImageOfTheDayModel>
@@ -32,24 +32,42 @@ class MainViewModel(private val database: AsteroidDAO) : ViewModel() {
     val stateManagement: LiveData<StateManagement>
         get() = _stateManagement
 
-
+    var asteroids: LiveData<List<Asteroid>>? = null
     fun getNeoFeed() {
-        viewModelScope.launch(Dispatchers.IO){
+        viewModelScope.launch(Dispatchers.IO) {
+            database.clear("2023-01-01")
+
             try {
-                _stateManagement.postValue(StateManagement.LOADING)
+//                _stateManagement.postValue(StateManagement.LOADING)
                 val responseBody = RetrofitObject.retrofit.getNeoFeed(todayDate(), tomorrowDate()).string()
 
                 val jsonObject = JSONObject(responseBody)
                 val asteroidList = parseAsteroidsJsonResult(jsonObject)
 
-                _asteroidList.postValue(asteroidList)
+//                _asteroidList.postValue(asteroidList)
+//                _stateManagement.postValue(StateManagement.DONE)
+
+                for (asteroid in asteroidList)
+                    database.insert(asteroid)
+
+                _stateManagement.postValue(StateManagement.LOADING)
+                getNeoFeedFromDB()
                 _stateManagement.postValue(StateManagement.DONE)
 
-//                for (asteroid in asteroidList )
-//                database.insert(asteroid)
+//                _stateManagement.postValue(StateManagement.DONE)
 
             } catch (e: Exception) {
-                _stateManagement.postValue(StateManagement.ERROR)
+//                _stateManagement.postValue(StateManagement.ERROR)
+            }
+        }
+    }
+
+    private fun getNeoFeedFromDB() {
+        viewModelScope.launch(Dispatchers.IO) {
+            try {
+                asteroids = database.getAsteroids()
+            } catch (e: Exception) {
+
             }
         }
     }
@@ -81,7 +99,8 @@ class MainViewModel(private val database: AsteroidDAO) : ViewModel() {
     }
 
     init {
-        getNeoFeed()
+        getNeoFeedFromDB()
+        //    getNeoFeed()
         getImageOfTheDay()
     }
 }
