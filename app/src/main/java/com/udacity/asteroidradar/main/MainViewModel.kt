@@ -6,6 +6,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.udacity.asteroidradar.Asteroid
+import com.udacity.asteroidradar.Constants.DEFAULT_END_DATE_DAYS
 import com.udacity.asteroidradar.ImageOfTheDayModel
 import com.udacity.asteroidradar.StateManagement
 import com.udacity.asteroidradar.api.RetrofitObject
@@ -16,11 +17,13 @@ import kotlinx.coroutines.launch
 import org.json.JSONObject
 import java.text.SimpleDateFormat
 import java.util.*
+import kotlin.collections.ArrayList
 
 class MainViewModel(private val database: AsteroidDAO) : ViewModel() {
 
 //    private val _asteroidList = MutableLiveData<ArrayList<Asteroid>>()
-//    val asteroidList: LiveData<ArrayList<Asteroid>>
+//    private val _asteroidList = MutableLiveData<Asteroid>()
+//    val asteroidList: LiveData<Asteroid>
 //        get() = _asteroidList
 
     private val _imageOfTheDay = MutableLiveData<ImageOfTheDayModel>()
@@ -33,41 +36,33 @@ class MainViewModel(private val database: AsteroidDAO) : ViewModel() {
         get() = _stateManagement
 
     var asteroids: LiveData<List<Asteroid>>? = null
+
     fun getNeoFeed() {
         viewModelScope.launch(Dispatchers.IO) {
-            database.clear("2023-01-01")
-
+            _stateManagement.postValue(StateManagement.LOADING)
             try {
-//                _stateManagement.postValue(StateManagement.LOADING)
-                val responseBody = RetrofitObject.retrofit.getNeoFeed(todayDate(), tomorrowDate()).string()
+                val responseBody = RetrofitObject.retrofit.getNeoFeed(todayDate(), endDayDate()).string()
 
                 val jsonObject = JSONObject(responseBody)
                 val asteroidList = parseAsteroidsJsonResult(jsonObject)
 
-//                _asteroidList.postValue(asteroidList)
-//                _stateManagement.postValue(StateManagement.DONE)
-
-                for (asteroid in asteroidList)
-                    database.insert(asteroid)
-
-                _stateManagement.postValue(StateManagement.LOADING)
-                getNeoFeedFromDB()
                 _stateManagement.postValue(StateManagement.DONE)
 
-//                _stateManagement.postValue(StateManagement.DONE)
-
+                cacheAsteroidsDate(asteroidList)
             } catch (e: Exception) {
-//                _stateManagement.postValue(StateManagement.ERROR)
+                _stateManagement.postValue(StateManagement.ERROR)
             }
         }
     }
 
     private fun getNeoFeedFromDB() {
         viewModelScope.launch(Dispatchers.IO) {
+            _stateManagement.postValue(StateManagement.LOADING)
             try {
-                asteroids = database.getAsteroids()
+                asteroids = database.getAsteroids(todayDate())
+                _stateManagement.postValue(StateManagement.DONE)
             } catch (e: Exception) {
-
+                _stateManagement.postValue(StateManagement.ERROR)
             }
         }
     }
@@ -81,6 +76,16 @@ class MainViewModel(private val database: AsteroidDAO) : ViewModel() {
         }
     }
 
+    private suspend fun cacheAsteroidsDate(asteroidList: ArrayList<Asteroid>) {
+        for (asteroid in asteroidList)
+            database.insert(asteroid)
+    }
+
+    fun getNeoFeedOfToday(){
+        asteroids = null
+//        asteroids =  database.getAsteroidsOfToday(todayDate())
+    }
+
     @SuppressLint("SimpleDateFormat")
     private fun todayDate(): String {
         val calendar = Calendar.getInstance()
@@ -90,17 +95,17 @@ class MainViewModel(private val database: AsteroidDAO) : ViewModel() {
     }
 
     @SuppressLint("SimpleDateFormat")
-    private fun tomorrowDate(): String {
+    private fun endDayDate(): String {
         val calendar = Calendar.getInstance()
-        calendar.add(Calendar.DAY_OF_YEAR, 7)
+        calendar.add(Calendar.DAY_OF_YEAR, DEFAULT_END_DATE_DAYS)
         val tomorrowDate = calendar.time
         val sdf = SimpleDateFormat("yyyy-MM-dd")
         return sdf.format(tomorrowDate)
     }
 
     init {
-        getNeoFeedFromDB()
-        //    getNeoFeed()
+//        getNeoFeed()
         getImageOfTheDay()
+        getNeoFeedFromDB()
     }
 }

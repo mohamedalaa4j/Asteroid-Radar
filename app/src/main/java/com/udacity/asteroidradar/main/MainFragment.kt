@@ -21,6 +21,7 @@ class MainFragment : Fragment() {
 //    private val viewModel: MainViewModel by lazy {
 //        ViewModelProvider(this).get(MainViewModel::class.java)
 //    }
+    private lateinit var viewModel : MainViewModel
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -34,7 +35,7 @@ class MainFragment : Fragment() {
         val database = AsteroidDatabase.getInstance(application).asteroidDAO
 
         val viewModelFactory = MainViewModelFactory(database)
-        val viewModel = ViewModelProvider(this, viewModelFactory).get(MainViewModel::class.java)
+          viewModel = ViewModelProvider(this, viewModelFactory).get(MainViewModel::class.java)
 
 
         binding?.viewModel = viewModel
@@ -43,12 +44,12 @@ class MainFragment : Fragment() {
 
         viewModel.stateManagement.observe(viewLifecycleOwner) {
             when (it) {
-                StateManagement.DONE ->{
-                    binding?.statusLoadingWheel?.visibility = View.GONE
-                    binding?.ivRefresh?.visibility = View.GONE
-                }
                 StateManagement.LOADING -> {
                     binding?.statusLoadingWheel?.visibility = View.VISIBLE
+                    binding?.ivRefresh?.visibility = View.GONE
+                }
+                StateManagement.DONE ->{
+                    binding?.statusLoadingWheel?.visibility = View.GONE
                     binding?.ivRefresh?.visibility = View.GONE
                 }
                 StateManagement.ERROR -> {
@@ -85,6 +86,14 @@ class MainFragment : Fragment() {
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        when (item.itemId) {
+            R.id.show_all_menu -> {
+                Toast.makeText(context, getString(R.string.error), Toast.LENGTH_SHORT).show()
+            }
+            R.id.show_rent_menu -> {
+                viewModel.getNeoFeedOfToday()
+            }
+        }
         return true
     }
 
@@ -96,5 +105,6 @@ class MainFragment : Fragment() {
             findNavController().navigate(MainFragmentDirections.actionShowDetail(it))
         })
         binding?.asteroidRecycler?.adapter = adapter
+
     }
 }

@@ -3,10 +3,11 @@ package com.udacity.asteroidradar
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.databinding.BindingAdapter
+import androidx.lifecycle.LiveData
 import androidx.recyclerview.widget.RecyclerView
 
 @BindingAdapter("listData")
-fun bindRecyclerView(recyclerView: RecyclerView, data: List<Asteroid>?) {
+fun bindRecyclerView(recyclerView: RecyclerView, data: MutableList<Asteroid>?) {
     val adapter = recyclerView.adapter as RvAsteroidsAdapter
     adapter.submitList(data)
 }
