@@ -1,4 +1,4 @@
-package com.udacity.asteroidradar
+package com.udacity.asteroidradar.utilities
 
 object Constants {
     const val DEFAULT_END_DATE_DAYS = 7

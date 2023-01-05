@@ -1,10 +1,12 @@
-package com.udacity.asteroidradar
+package com.udacity.asteroidradar.utilities
 
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.databinding.BindingAdapter
-import androidx.lifecycle.LiveData
 import androidx.recyclerview.widget.RecyclerView
+import com.udacity.asteroidradar.data.models.Asteroid
+import com.udacity.asteroidradar.R
+import com.udacity.asteroidradar.scenes.main.RvAsteroidsAdapter
 
 @BindingAdapter("listData")
 fun bindRecyclerView(recyclerView: RecyclerView, data: MutableList<Asteroid>?) {

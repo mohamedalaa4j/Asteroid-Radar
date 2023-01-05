@@ -1,9 +1,9 @@
-package com.udacity.asteroidradar.api
+package com.udacity.asteroidradar.data.api
 
-import com.udacity.asteroidradar.Constants.API_KEY
-import com.udacity.asteroidradar.Constants.IMAGE_OF_THE_DAY
-import com.udacity.asteroidradar.Constants.NEO_FEED
-import com.udacity.asteroidradar.ImageOfTheDayModel
+import com.udacity.asteroidradar.utilities.Constants.API_KEY
+import com.udacity.asteroidradar.utilities.Constants.IMAGE_OF_THE_DAY
+import com.udacity.asteroidradar.utilities.Constants.NEO_FEED
+import com.udacity.asteroidradar.data.models.ImageOfTheDayModel
 import okhttp3.ResponseBody
 import retrofit2.Response
 import retrofit2.http.GET

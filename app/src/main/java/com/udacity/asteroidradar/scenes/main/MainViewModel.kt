@@ -1,4 +1,4 @@
-package com.udacity.asteroidradar.main
+package com.udacity.asteroidradar.scenes.main
 
 import android.annotation.SuppressLint
 import android.util.Log
@@ -6,14 +6,14 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.udacity.asteroidradar.Asteroid
-import com.udacity.asteroidradar.Constants.DEFAULT_END_DATE_DAYS
-import com.udacity.asteroidradar.Constants.WEEK_END_DATE_DAYS
-import com.udacity.asteroidradar.ImageOfTheDayModel
-import com.udacity.asteroidradar.StateManagement
-import com.udacity.asteroidradar.api.RetrofitObject
-import com.udacity.asteroidradar.api.parseAsteroidsJsonResult
-import com.udacity.asteroidradar.database.AsteroidDAO
+import com.udacity.asteroidradar.data.models.Asteroid
+import com.udacity.asteroidradar.utilities.Constants.DEFAULT_END_DATE_DAYS
+import com.udacity.asteroidradar.utilities.Constants.WEEK_END_DATE_DAYS
+import com.udacity.asteroidradar.data.models.ImageOfTheDayModel
+import com.udacity.asteroidradar.utilities.StateManagement
+import com.udacity.asteroidradar.data.api.RetrofitObject
+import com.udacity.asteroidradar.utilities.parseAsteroidsJsonResult
+import com.udacity.asteroidradar.data.database.AsteroidDAO
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import org.json.JSONObject

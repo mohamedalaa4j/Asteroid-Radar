@@ -1,11 +1,11 @@
-package com.udacity.asteroidradar.database
+package com.udacity.asteroidradar.data.database
 
 import androidx.lifecycle.LiveData
 import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
-import com.udacity.asteroidradar.Asteroid
+import com.udacity.asteroidradar.data.models.Asteroid
 
 @Dao
 interface AsteroidDAO {

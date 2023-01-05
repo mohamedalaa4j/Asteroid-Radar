@@ -1,4 +1,4 @@
-package com.udacity.asteroidradar
+package com.udacity.asteroidradar.scenes.main
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
@@ -6,9 +6,13 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.squareup.picasso.Picasso
+import com.udacity.asteroidradar.data.models.Asteroid
+import com.udacity.asteroidradar.R
 import com.udacity.asteroidradar.databinding.RvItemAsteroidBinding
 
-class RvAsteroidsAdapter(private val onClickListener: OnClickListener) : ListAdapter<Asteroid, RvAsteroidsAdapter.ViewHolder>(AsteroidsDiffCallback()) {
+class RvAsteroidsAdapter(private val onClickListener: OnClickListener) : ListAdapter<Asteroid, RvAsteroidsAdapter.ViewHolder>(
+    AsteroidsDiffCallback()
+) {
 
     class ViewHolder(binding: RvItemAsteroidBinding) : RecyclerView.ViewHolder(binding.root) {
         val tvName = binding.tvName
@@ -43,8 +47,8 @@ class RvAsteroidsAdapter(private val onClickListener: OnClickListener) : ListAda
         }
     }
 
-    class OnClickListener(val lambda: (asteroidObject:Asteroid) -> Unit) {
-        fun onClick(asteroidObject:Asteroid) = lambda(asteroidObject)
+    class OnClickListener(val lambda: (asteroidObject: Asteroid) -> Unit) {
+        fun onClick(asteroidObject: Asteroid) = lambda(asteroidObject)
     }
 }
 

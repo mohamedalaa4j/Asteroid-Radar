@@ -1,4 +1,4 @@
-package com.udacity.asteroidradar.main
+package com.udacity.asteroidradar.scenes.main
 
 import android.os.Bundle
 import android.view.*
@@ -9,9 +9,8 @@ import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.squareup.picasso.Picasso
 import com.udacity.asteroidradar.R
-import com.udacity.asteroidradar.RvAsteroidsAdapter
-import com.udacity.asteroidradar.StateManagement
-import com.udacity.asteroidradar.database.AsteroidDatabase
+import com.udacity.asteroidradar.utilities.StateManagement
+import com.udacity.asteroidradar.data.database.AsteroidDatabase
 import com.udacity.asteroidradar.databinding.FragmentMainBinding
 
 class MainFragment : Fragment() {
