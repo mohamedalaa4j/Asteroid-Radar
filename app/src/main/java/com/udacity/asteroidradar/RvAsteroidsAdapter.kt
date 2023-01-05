@@ -54,6 +54,6 @@ class AsteroidsDiffCallback : DiffUtil.ItemCallback<Asteroid>() {
     }
 
     override fun areContentsTheSame(oldItem: Asteroid, newItem: Asteroid): Boolean {
-        return oldItem == newItem
+        return oldItem.id == newItem.id
     }
 }

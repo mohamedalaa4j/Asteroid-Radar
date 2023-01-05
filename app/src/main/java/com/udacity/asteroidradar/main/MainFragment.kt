@@ -5,7 +5,6 @@ import android.view.*
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.observe
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.squareup.picasso.Picasso
@@ -18,37 +17,35 @@ import com.udacity.asteroidradar.databinding.FragmentMainBinding
 class MainFragment : Fragment() {
     private var binding: FragmentMainBinding? = null
 
-//    private val viewModel: MainViewModel by lazy {
-//        ViewModelProvider(this).get(MainViewModel::class.java)
-//    }
-    private lateinit var viewModel : MainViewModel
+    private lateinit var viewModel: MainViewModel
 
-    override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View {
+    private val adapter = RvAsteroidsAdapter(RvAsteroidsAdapter.OnClickListener {
+        findNavController().navigate(MainFragmentDirections.actionShowDetail(it))
+    })
+
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         binding = FragmentMainBinding.inflate(inflater)
         binding?.lifecycleOwner = this
 
         val application = requireNotNull(this.activity).application
-
         val database = AsteroidDatabase.getInstance(application).asteroidDAO
-
         val viewModelFactory = MainViewModelFactory(database)
-          viewModel = ViewModelProvider(this, viewModelFactory).get(MainViewModel::class.java)
-
+        viewModel = ViewModelProvider(this, viewModelFactory).get(MainViewModel::class.java)
 
         binding?.viewModel = viewModel
 
         setHasOptionsMenu(true)
 
+        binding?.asteroidRecycler?.layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
+        binding?.asteroidRecycler?.adapter = adapter
+
         viewModel.stateManagement.observe(viewLifecycleOwner) {
-            when (it) {
+            when (it!!) {
                 StateManagement.LOADING -> {
                     binding?.statusLoadingWheel?.visibility = View.VISIBLE
                     binding?.ivRefresh?.visibility = View.GONE
                 }
-                StateManagement.DONE ->{
+                StateManagement.DONE -> {
                     binding?.statusLoadingWheel?.visibility = View.GONE
                     binding?.ivRefresh?.visibility = View.GONE
                 }
@@ -65,7 +62,9 @@ class MainFragment : Fragment() {
             binding?.activityMainImageOfTheDay?.contentDescription = it.title
         }
 
-        setupRV()
+        viewModel.asteroids?.observe(viewLifecycleOwner) {
+            adapter.submitList(it)
+        }
 
         binding?.ivRefresh?.setOnClickListener {
             viewModel.getNeoFeed()
@@ -87,24 +86,34 @@ class MainFragment : Fragment() {
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
-            R.id.show_all_menu -> {
-                Toast.makeText(context, getString(R.string.error), Toast.LENGTH_SHORT).show()
+            R.id.view_week_asteroids -> {
+                Toast.makeText(context, "week", Toast.LENGTH_SHORT).show()
             }
-            R.id.show_rent_menu -> {
-                viewModel.getNeoFeedOfToday()
+
+            R.id.view_today_asteroids -> {
+                viewModel.getNeoFeedOfTodayFromDB()
+                viewModel.asteroids?.observe(viewLifecycleOwner) {
+                    adapter.submitList(it)
+                }
+            }
+
+            R.id.view_saved_asteroids -> {
+                viewModel.getNeoFeedFromDB()
+                viewModel.asteroids?.observe(viewLifecycleOwner) {
+                    adapter.submitList(it)
+                }
             }
         }
         return true
     }
 
-    private fun setupRV() {
-        binding?.asteroidRecycler?.layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
-
-        // adapter
-        val adapter = RvAsteroidsAdapter(RvAsteroidsAdapter.OnClickListener{
-            findNavController().navigate(MainFragmentDirections.actionShowDetail(it))
-        })
-        binding?.asteroidRecycler?.adapter = adapter
-
-    }
+//    private fun setupRV() {
+//        binding?.asteroidRecycler?.layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
+//
+//        // adapter
+//         adapter = RvAsteroidsAdapter(RvAsteroidsAdapter.OnClickListener {
+//            findNavController().navigate(MainFragmentDirections.actionShowDetail(it))
+//        })
+//        binding?.asteroidRecycler?.adapter = adapter
+//    }
 }

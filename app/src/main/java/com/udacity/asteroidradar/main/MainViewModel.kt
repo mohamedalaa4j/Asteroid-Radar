@@ -17,7 +17,6 @@ import kotlinx.coroutines.launch
 import org.json.JSONObject
 import java.text.SimpleDateFormat
 import java.util.*
-import kotlin.collections.ArrayList
 
 class MainViewModel(private val database: AsteroidDAO) : ViewModel() {
 
@@ -37,9 +36,25 @@ class MainViewModel(private val database: AsteroidDAO) : ViewModel() {
 
     var asteroids: LiveData<List<Asteroid>>? = null
 
+    private val _imageOfTheDayContentDescription= MutableLiveData<String>()
+     val imageOfTheDayContentDescription: LiveData<String>
+        get() = _imageOfTheDayContentDescription
+
+    fun getImageOfTheDay() {
+        viewModelScope.launch {
+            try {
+                _imageOfTheDay.postValue(RetrofitObject.retrofit.getImageOfTheDay().body())
+
+                _imageOfTheDayContentDescription.postValue(RetrofitObject.retrofit.getImageOfTheDay().body()?.url)
+            } catch (e: Exception) {
+            }
+        }
+    }
+
     fun getNeoFeed() {
         viewModelScope.launch(Dispatchers.IO) {
             _stateManagement.postValue(StateManagement.LOADING)
+
             try {
                 val responseBody = RetrofitObject.retrofit.getNeoFeed(todayDate(), endDayDate()).string()
 
@@ -55,9 +70,15 @@ class MainViewModel(private val database: AsteroidDAO) : ViewModel() {
         }
     }
 
-    private fun getNeoFeedFromDB() {
-        viewModelScope.launch(Dispatchers.IO) {
+    private suspend fun cacheAsteroidsDate(asteroidList: ArrayList<Asteroid>) {
+        for (asteroid in asteroidList)
+            database.insert(asteroid)
+    }
+
+    fun getNeoFeedFromDB() {
+        viewModelScope.launch {
             _stateManagement.postValue(StateManagement.LOADING)
+
             try {
                 asteroids = database.getAsteroids(todayDate())
                 _stateManagement.postValue(StateManagement.DONE)
@@ -67,23 +88,17 @@ class MainViewModel(private val database: AsteroidDAO) : ViewModel() {
         }
     }
 
-    fun getImageOfTheDay() {
+    fun getNeoFeedOfTodayFromDB() {
         viewModelScope.launch {
+            _stateManagement.postValue(StateManagement.LOADING)
+
             try {
-                _imageOfTheDay.postValue(RetrofitObject.retrofit.getImageOfTheDay().body())
+                asteroids = database.getAsteroidsOfToday(todayDate())
+                _stateManagement.postValue(StateManagement.DONE)
             } catch (e: Exception) {
+                _stateManagement.postValue(StateManagement.ERROR)
             }
         }
-    }
-
-    private suspend fun cacheAsteroidsDate(asteroidList: ArrayList<Asteroid>) {
-        for (asteroid in asteroidList)
-            database.insert(asteroid)
-    }
-
-    fun getNeoFeedOfToday(){
-        asteroids = null
-//        asteroids =  database.getAsteroidsOfToday(todayDate())
     }
 
     @SuppressLint("SimpleDateFormat")
@@ -104,7 +119,6 @@ class MainViewModel(private val database: AsteroidDAO) : ViewModel() {
     }
 
     init {
-//        getNeoFeed()
         getImageOfTheDay()
         getNeoFeedFromDB()
     }
