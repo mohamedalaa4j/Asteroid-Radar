@@ -66,6 +66,8 @@ class MainViewModel(private val database: AsteroidDAO) : ViewModel() {
                 _stateManagement.postValue(StateManagement.DONE)
 
                 cacheAsteroidsDate(asteroidList)
+                getSavedAsteroidsFromDB()
+
             } catch (e: Exception) {
                 Log.e("apiRequest", e.message.toString())
                 _stateManagement.postValue(StateManagement.ERROR)
@@ -137,8 +139,6 @@ class MainViewModel(private val database: AsteroidDAO) : ViewModel() {
     }
 
     init {
-
-        getNeoFeed()
         getImageOfTheDay()
         getSavedAsteroidsFromDB()
     }
