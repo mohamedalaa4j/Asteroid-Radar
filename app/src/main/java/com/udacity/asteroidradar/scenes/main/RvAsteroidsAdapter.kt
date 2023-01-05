@@ -38,8 +38,10 @@ class RvAsteroidsAdapter(private val onClickListener: OnClickListener) : ListAda
 
         if (item.isPotentiallyHazardous) {
             Picasso.with(context).load(R.drawable.ic_status_potentially_hazardous).into(holder.ivStatus)
+            holder.ivStatus.contentDescription= context.getString(R.string.potentially_hazardous_asteroid_image)
         } else {
             Picasso.with(context).load(R.drawable.ic_status_normal).into(holder.ivStatus)
+            holder.ivStatus.contentDescription= context.getString(R.string.not_hazardous_asteroid_image)
         }
 
         holder.itemView.setOnClickListener {

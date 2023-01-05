@@ -1,7 +1,6 @@
 package com.udacity.asteroidradar.scenes.main
 
 import android.annotation.SuppressLint
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -22,11 +21,6 @@ import java.util.*
 
 class MainViewModel(private val database: AsteroidDAO) : ViewModel() {
 
-//    private val _asteroidList = MutableLiveData<ArrayList<Asteroid>>()
-//    private val _asteroidList = MutableLiveData<Asteroid>()
-//    val asteroidList: LiveData<Asteroid>
-//        get() = _asteroidList
-
     private val _imageOfTheDay = MutableLiveData<ImageOfTheDayModel>()
     val imageOfTheDay: LiveData<ImageOfTheDayModel>
         get() = _imageOfTheDay
@@ -46,8 +40,7 @@ class MainViewModel(private val database: AsteroidDAO) : ViewModel() {
         viewModelScope.launch {
             try {
                 _imageOfTheDay.postValue(RetrofitObject.retrofit.getImageOfTheDay().body())
-
-                _imageOfTheDayContentDescription.postValue(RetrofitObject.retrofit.getImageOfTheDay().body()?.url)
+                _imageOfTheDayContentDescription.postValue(RetrofitObject.retrofit.getImageOfTheDay().body()?.title)
             } catch (e: Exception) {
             }
         }
@@ -65,17 +58,16 @@ class MainViewModel(private val database: AsteroidDAO) : ViewModel() {
 
                 _stateManagement.postValue(StateManagement.DONE)
 
-                cacheAsteroidsDate(asteroidList)
+                cacheAsteroidsData(asteroidList)
                 getSavedAsteroidsFromDB()
 
             } catch (e: Exception) {
-                Log.e("apiRequest", e.message.toString())
                 _stateManagement.postValue(StateManagement.ERROR)
             }
         }
     }
 
-    private suspend fun cacheAsteroidsDate(asteroidList: ArrayList<Asteroid>) {
+    private suspend fun cacheAsteroidsData(asteroidList: ArrayList<Asteroid>) {
         for (asteroid in asteroidList)
             database.insert(asteroid)
     }
@@ -99,7 +91,6 @@ class MainViewModel(private val database: AsteroidDAO) : ViewModel() {
 
             try {
                 asteroids = database.getTodayAsteroids(todayDate())
-                Log.e("getTodayAsteroids",asteroids.toString() )
                 _stateManagement.postValue(StateManagement.DONE)
             } catch (e: Exception) {
                 _stateManagement.postValue(StateManagement.ERROR)
@@ -113,7 +104,6 @@ class MainViewModel(private val database: AsteroidDAO) : ViewModel() {
 
             try {
                 asteroids = database.getWeekAsteroids(todayDate(),endDayDate(WEEK_END_DATE_DAYS))
-                Log.e("getWeekAsteroids",asteroids.toString() )
                 _stateManagement.postValue(StateManagement.DONE)
             } catch (e: Exception) {
                 _stateManagement.postValue(StateManagement.ERROR)

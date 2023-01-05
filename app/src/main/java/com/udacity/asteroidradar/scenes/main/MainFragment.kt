@@ -58,7 +58,6 @@ class MainFragment : Fragment() {
 
         viewModel.imageOfTheDay.observe(viewLifecycleOwner) {
             Picasso.with(context).load(it.url).into(binding?.activityMainImageOfTheDay)
-            binding?.activityMainImageOfTheDay?.contentDescription = it.title
         }
 
         viewModel.asteroids?.observe(viewLifecycleOwner) {
@@ -75,7 +74,7 @@ class MainFragment : Fragment() {
 
     override fun onDestroyView() {
         super.onDestroyView()
-        binding = null
+        binding = null //to prevent memory leaks
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
@@ -108,14 +107,4 @@ class MainFragment : Fragment() {
         }
         return true
     }
-
-//    private fun setupRV() {
-//        binding?.asteroidRecycler?.layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
-//
-//        // adapter
-//         adapter = RvAsteroidsAdapter(RvAsteroidsAdapter.OnClickListener {
-//            findNavController().navigate(MainFragmentDirections.actionShowDetail(it))
-//        })
-//        binding?.asteroidRecycler?.adapter = adapter
-//    }
 }

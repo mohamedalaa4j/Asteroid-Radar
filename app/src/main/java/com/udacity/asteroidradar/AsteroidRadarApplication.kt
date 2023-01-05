@@ -40,7 +40,7 @@ class AsteroidRadarApplication : Application() {
         val constraints = Constraints.Builder()
             .setRequiredNetworkType(NetworkType.CONNECTED)
             .setRequiresBatteryNotLow(true)
-//            .setRequiresCharging(true)
+            .setRequiresCharging(true)
             .build()
 
         val repeatingRequest = PeriodicWorkRequestBuilder<DeleteOutdatedAsteroidsWorker>(1, TimeUnit.DAYS).setConstraints(constraints)

@@ -21,14 +21,11 @@ class DeleteOutdatedAsteroidsWorker(appContext: Context, params: WorkerParameter
     override suspend fun doWork(): Result {
         return try {
             database.clearBefore(todayDate())
-            Log.e("workManager","done")
             Result.success()
         } catch (e: HttpException) {
-            Log.e("workManager","fail")
             Result.retry()
         }
     }
-
 
     @SuppressLint("SimpleDateFormat")
     private fun todayDate(): String {
