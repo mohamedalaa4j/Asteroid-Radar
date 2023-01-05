@@ -1,12 +1,14 @@
 package com.udacity.asteroidradar.main
 
 import android.annotation.SuppressLint
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.udacity.asteroidradar.Asteroid
 import com.udacity.asteroidradar.Constants.DEFAULT_END_DATE_DAYS
+import com.udacity.asteroidradar.Constants.WEEK_END_DATE_DAYS
 import com.udacity.asteroidradar.ImageOfTheDayModel
 import com.udacity.asteroidradar.StateManagement
 import com.udacity.asteroidradar.api.RetrofitObject
@@ -56,7 +58,7 @@ class MainViewModel(private val database: AsteroidDAO) : ViewModel() {
             _stateManagement.postValue(StateManagement.LOADING)
 
             try {
-                val responseBody = RetrofitObject.retrofit.getNeoFeed(todayDate(), endDayDate()).string()
+                val responseBody = RetrofitObject.retrofit.getNeoFeed(todayDate(), endDayDate(DEFAULT_END_DATE_DAYS)).string()
 
                 val jsonObject = JSONObject(responseBody)
                 val asteroidList = parseAsteroidsJsonResult(jsonObject)
@@ -65,6 +67,7 @@ class MainViewModel(private val database: AsteroidDAO) : ViewModel() {
 
                 cacheAsteroidsDate(asteroidList)
             } catch (e: Exception) {
+                Log.e("apiRequest", e.message.toString())
                 _stateManagement.postValue(StateManagement.ERROR)
             }
         }
@@ -75,12 +78,12 @@ class MainViewModel(private val database: AsteroidDAO) : ViewModel() {
             database.insert(asteroid)
     }
 
-    fun getNeoFeedFromDB() {
+    fun getSavedAsteroidsFromDB() {
         viewModelScope.launch {
             _stateManagement.postValue(StateManagement.LOADING)
 
             try {
-                asteroids = database.getAsteroids(todayDate())
+                asteroids = database.getSavedAsteroids(todayDate())
                 _stateManagement.postValue(StateManagement.DONE)
             } catch (e: Exception) {
                 _stateManagement.postValue(StateManagement.ERROR)
@@ -88,12 +91,27 @@ class MainViewModel(private val database: AsteroidDAO) : ViewModel() {
         }
     }
 
-    fun getNeoFeedOfTodayFromDB() {
+    fun getTodayAsteroidsFromDB() {
         viewModelScope.launch {
             _stateManagement.postValue(StateManagement.LOADING)
 
             try {
-                asteroids = database.getAsteroidsOfToday(todayDate())
+                asteroids = database.getTodayAsteroids(todayDate())
+                Log.e("getTodayAsteroids",asteroids.toString() )
+                _stateManagement.postValue(StateManagement.DONE)
+            } catch (e: Exception) {
+                _stateManagement.postValue(StateManagement.ERROR)
+            }
+        }
+    }
+
+    fun getWeekAsteroidsFromDB() {
+        viewModelScope.launch {
+            _stateManagement.postValue(StateManagement.LOADING)
+
+            try {
+                asteroids = database.getWeekAsteroids(todayDate(),endDayDate(WEEK_END_DATE_DAYS))
+                Log.e("getWeekAsteroids",asteroids.toString() )
                 _stateManagement.postValue(StateManagement.DONE)
             } catch (e: Exception) {
                 _stateManagement.postValue(StateManagement.ERROR)
@@ -110,16 +128,18 @@ class MainViewModel(private val database: AsteroidDAO) : ViewModel() {
     }
 
     @SuppressLint("SimpleDateFormat")
-    private fun endDayDate(): String {
+    private fun endDayDate(period : Int): String {
         val calendar = Calendar.getInstance()
-        calendar.add(Calendar.DAY_OF_YEAR, DEFAULT_END_DATE_DAYS)
+        calendar.add(Calendar.DAY_OF_YEAR, period)
         val tomorrowDate = calendar.time
         val sdf = SimpleDateFormat("yyyy-MM-dd")
         return sdf.format(tomorrowDate)
     }
 
     init {
+
+        getNeoFeed()
         getImageOfTheDay()
-        getNeoFeedFromDB()
+        getSavedAsteroidsFromDB()
     }
 }

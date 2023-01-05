@@ -87,18 +87,21 @@ class MainFragment : Fragment() {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
             R.id.view_week_asteroids -> {
-                Toast.makeText(context, "week", Toast.LENGTH_SHORT).show()
+                viewModel.getWeekAsteroidsFromDB()
+                viewModel.asteroids?.observe(viewLifecycleOwner) {
+                    adapter.submitList(it)
+                }
             }
 
             R.id.view_today_asteroids -> {
-                viewModel.getNeoFeedOfTodayFromDB()
+                viewModel.getTodayAsteroidsFromDB()
                 viewModel.asteroids?.observe(viewLifecycleOwner) {
                     adapter.submitList(it)
                 }
             }
 
             R.id.view_saved_asteroids -> {
-                viewModel.getNeoFeedFromDB()
+                viewModel.getSavedAsteroidsFromDB()
                 viewModel.asteroids?.observe(viewLifecycleOwner) {
                     adapter.submitList(it)
                 }
